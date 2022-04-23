@@ -1,0 +1,13 @@
+version: "3"
+
+services:
+
+  todo_api:
+    container_name: todo_api
+    build: ./backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./:/django-app
+    restart: always
+    command: python3 backend/manage.py runserver 0.0.0.0:8000
