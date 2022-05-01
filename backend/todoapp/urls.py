@@ -16,14 +16,18 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+from rest_framework_simplejwt import views as jwt_views
+
 from rest_framework import routers
 from todolist.api import viewsets
 
 router = routers.DefaultRouter()
 router.register(r'users', viewsets.UserViewSet)
 router.register(r'groups', viewsets.GroupViewSet)
+router.register(r'todo_items', viewsets.TodoItemViewSet)
 
 urlpatterns = [
-    path('', include(router.urls))
-    #path('admin/', admin.site.urls),
+    path('', include(router.urls)),
+    path('token', jwt_views.TokenObtainPairView.as_view()),
+    path('admin/', admin.site.urls),
 ]
