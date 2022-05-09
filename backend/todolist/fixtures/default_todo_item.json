@@ -1,0 +1,14 @@
+[
+  {
+    "model": "todolist.todoitem",
+    "pk": 1,
+    "fields": {
+    "created_at": "2022-05-03T21:54:24.691202+00:00",
+      "author": 1,
+      "post": {
+      	"title": "default todo item",
+	"details": ["todo 1", "todo 2"]
+      }
+    }
+  }
+]
