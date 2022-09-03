@@ -2,8 +2,8 @@ version: "3"
 
 services:
 
-  todo_api:
-    container_name: todo_api
+  todo_backend:
+    container_name: todo_backend
     build: ./backend
     ports:
       - "8000:8000"
@@ -11,3 +11,15 @@ services:
       - ./backend:/django-app
     restart: always
     command: python3 manage.py runserver 0.0.0.0:8000
+
+  todo_frontend:
+    container_name: todo_frontend
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/node_modules/.cache
+    restart: always
+    command: npm start
