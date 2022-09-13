@@ -1,5 +1,6 @@
 from django.contrib import admin
-from todolist.models import TodoItem
+from todolist.models import Task
 
 
-admin.site.register(TodoItem)
+admin.site.register(Task)
+

@@ -7,3 +7,6 @@ run_backed:
 migrate_backend:
 	sudo docker-compose run --rm todo_backend python3 manage.py makemigrations todolist
 	sudo docker-compose run --rm todo_backend python3 manage.py migrate
+
+su_create_backend:
+	sudo docker-compose run --rm todo_backend python3 manage.py createsuperuser

@@ -1,73 +1,39 @@
 from django.test import TestCase
-from todolist.models import TodoItem
+
+from todolist.models import Task
 from django.contrib.auth.models import User
-from todolist.api.serializers import TodoItemSerializer
-from rest_framework.parsers import JSONParser
-from rest_framework.renderers import JSONRenderer
 
-import datetime
-import io
+from todolist.serializers import TaskSerializer
 
 
-class TestTodoItem(TestCase):
-    def test_create_model(self):
+class TestTask(TestCase):
+    def test_create_task(self): 
         user = User(
             username='Mathias',
             password='Mathias'
         )
         user.save()
 
-        post = {
-            'title': 'Do english homework',
-            'details': [
-                {
-                    'task': 'To Write about my experience',
-                    'done': False
-                },
-                {
-                    'task': 'To do something nice',
-                    'done': True
-                }
-            ]
-        }
-        model = TodoItem(
+        parent_task_title = 'Go to the market'
+        child_task_title = 'Buy rice'
+
+        parent_task_model = Task(
             author=user,
-            post=post
+            title=parent_task_title
         )
-        model.save()
-        todo_item = TodoItem.objects.first()
+        parent_task_model.save()
 
-        self.assertEqual(todo_item.post, post)
-        self.assertEqual(todo_item.author, user)
-
-    def test_create_model_serialized_with_example(self):
-        user = User(
-            username='Mathias',
-            password='Mathias'
+        child_task_model = Task(
+            title=child_task_title,
+            parent_task=parent_task_model
         )
-        user.save()
+        child_task_model.save()
 
-        todoitem = TodoItem(
-            author=user,
-            post={'title': 'trying to serialize'}
-        )
+        task_parent_item = Task.objects.first()
 
-        serializer = TodoItemSerializer(todoitem)
-
-        json = JSONRenderer().render(serializer.data)
-
-        stream = io.BytesIO(json)
-        data = JSONParser().parse(stream)
-
-        serializer = TodoItemSerializer(data=data)
-        serializer.is_valid()
-        serializer.save()
-        
-        expected_post = {'title': 'trying to serialize'}
-
-        todo_item = TodoItem.objects.first()
-        self.assertEqual(todo_item.post, expected_post)
-        self.assertEqual(todo_item.author, user)
+        self.assertEqual(task_parent_item.author, user) 
+        self.assertEqual(task_parent_item.title, parent_task_title) 
+        self.assertEqual(task_parent_item.children_tasks.all()[0].title, 'Buy rice') 
 
     def test_create_model_serialized(self):
         user = User(
@@ -76,14 +42,26 @@ class TestTodoItem(TestCase):
         )
         user.save()
         
-        data = {
-            'post': {'title': 'My second test'},
-            'author':1
+        parent_data = {
+            'title': 'Go to the market',
+            'author': 1
         }
-        serializer = TodoItemSerializer(data=data)
+        serializer = TaskSerializer(data=parent_data)
         serializer.is_valid()
         serializer.save()
 
-        todo_item = TodoItem.objects.first()
-        self.assertEqual(todo_item.post, data['post'])
-        self.assertEqual(todo_item.author, user)
+        task_item = Task.objects.first()
+        self.assertEqual(task_item.title, parent_data['title'])
+        self.assertEqual(task_item.author, user)
+
+        child_data = {
+            'parent_task': 1,
+            'title': 'Buy rice',
+            'author': 1
+        }
+        serializer = TaskSerializer(data=child_data)
+        serializer.is_valid()
+        serializer.save()
+
+        task_item = Task.objects.get(title='Buy rice')
+        self.assertEqual(task_item.title, child_data['title'])
